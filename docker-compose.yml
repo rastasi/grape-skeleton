@@ -1,0 +1,44 @@
+version: "2"
+services:
+  rubyapp-db:
+    container_name: rubyapp-db
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: "database"
+      MYSQL_USER: "database"
+      MYSQL_PASSWORD: "toor"
+      MYSQL_ROOT_PASSWORD: "toor"
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+    volumes:
+      - rubyapp-db-data:/var/lib/mysql
+    networks:
+      inner:
+        aliases:
+          - rubyapp-db
+  rubyapp:
+    container_name: rubyapp
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - "./:/usr/src/app"
+      - "~/.ssh:/root/.ssh"
+    environment:
+      PORT: "9292"
+    expose:
+      - "9292"
+    ports:
+      - "9292:9292"
+    depends_on: 
+      - rubyapp-db
+    networks:
+      inner:
+        aliases:
+          - rubyapp
+networks:
+  inner: {}
+volumes:
+  rubyapp-db-data: {}
